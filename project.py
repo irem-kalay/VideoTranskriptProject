@@ -179,4 +179,4 @@ for idx, youtube_url in enumerate(urls, 1):
         continue
 
 end_time = time.time()
-print(f"Süre: {end_time - start_time:.2f} saniye")
+print(end_time - start_time)
