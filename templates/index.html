@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Özetleme Uygulaması</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/6.6.6/css/flag-icons.min.css">
+    <link rel="stylesheet" href="static/style.css" />
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="#" class="navbar-logo">
+                <i class="fas fa-video"></i>
+                <span data-translate="appName">VideoSummarizer</span>
+            </a>
+
+            <ul class="navbar-menu">
+                <li class="navbar-item"><a href="https://www.enocta.com/" class="navbar-link" data-translate="navHome">Ana Sayfa</a></li>
+                <li class="navbar-item"><a href="#" class="navbar-link" data-translate="navFeatures">Özellikler</a></li>
+
+                <li class="navbar-item"><a href="https://www.enocta.com/bize-ulasin" class="navbar-link" data-translate="navSupport">Destek</a></li>
+                <li class="navbar-item navbar-dropdown">
+                    <div class="dropdown-toggle navbar-link">
+                        <span class="fi fi-tr" id="currentFlag"></span>
+                        <span id="currentLanguage">TR</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="dropdown-menu">
+                        <div class="dropdown-item" data-lang="tr">
+                            <span class="fi fi-tr"></span> <span>Türkçe</span>
+                        </div>
+                        <div class="dropdown-item" data-lang="en">
+                            <span class="fi fi-gb"></span> <span>English</span>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="container">
+            <div class="logo-section">
+                <div class="logo"><i class="fas fa-video"></i> <span data-translate="appName">VideoSummarizer</span></div>
+                <div class="subtitle" data-translate="subtitle">Yapay Zeka Destekli Video Özetleme Aracı</div>
+            </div>
+
+            <div class="form-section">
+                <!-- CSV Yükleme -->
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-file-csv"></i> <span data-translate="uploadLabel">CSV Dosyası Yükle</span></label>
+                    <div class="file-upload-area" id="fileUploadArea">
+                        <input type="file" class="file-input" id="csvFile" accept=".csv" />
+                        <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                        <div class="upload-text" data-translate="dragDrop">CSV dosyanızı buraya sürükleyin</div>
+                        <div class="upload-subtext" data-translate="clickSelect">veya dosya seçmek için tıklayın</div>
+                    </div>
+                    <div class="file-info" id="fileInfo">
+                        <i class="fas fa-check-circle"></i>
+                        <span id="fileName"></span> <span data-translate="uploadSuccess">başarıyla yüklendi</span>
+                    </div>
+                </div>
+
+                <!-- AI Model Seçimi -->
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-robot"></i> <span data-translate="aiModelLabel">AI Model Seçimi</span></label>
+                    <div class="ai-options">
+                        <div class="ai-option selected" data-ai="mistral">
+                            <input type="radio" name="aiModel" value="mistral" checked>
+                            <div class="ai-option-content">
+                                <i class="fas fa-brain ai-icon"></i> <span class="ai-name">Mistral</span>
+                            </div>
+                        </div>
+                        <div class="ai-option" data-ai="gpt">
+                            <input type="radio" name="aiModel" value="gpt">
+                            <div class="ai-option-content">
+                                <i class="fas fa-lightbulb ai-icon"></i> <span class="ai-name">GPT-4</span>
+                            </div>
+                        </div>
+                        <div class="ai-option" data-ai="deepseek">
+                            <input type="radio" name="aiModel" value="deepseek">
+                            <div class="ai-option-content">
+                                <i class="fas fa-rocket ai-icon"></i> <span class="ai-name">Deepseek</span>
+                            </div>
+                        </div>
+                        <div class="ai-option" data-ai="gemini">
+                            <input type="radio" name="aiModel" value="gemini">
+                            <div class="ai-option-content">
+                                <i class="fas fa-gem ai-icon"></i> <span class="ai-name">Gemini</span>
+                            </div>
+                        </div>
+
+                        <div class="ai-option" data-ai="gemma">
+                            <input type="radio" name="aiModel" value="gemma">
+                            <div class="ai-option-content">
+                                <i class="fas fa-gem ai-icon"></i> <span class="ai-name">Gemma</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- İşlemi Başlat -->
+                <button class="process-btn" id="processBtn">
+                    <i class="fas fa-play"></i> <span data-translate="startProcess">Özetle</span>
+                </button>
+
+                <div class="progress-section" id="progressSection" style="display:none;">
+                    <div class="status-text" id="statusText" data-translate="starting">İşlem başlatılıyor...</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                </div>
+
+                <!-- Transkriptleri Göster -->
+                <button id="showTranscriptsBtn" class="process-btn" style="margin-top:15px; background-color:#4CAF50;">
+                    <i class="fas fa-file-alt"></i> <span data-translate="showTranscripts">Transkriptleri İndir</span>
+                </button>
+
+                <!-- Transkript Kutusu -->
+                <div id="transcriptBox"></div>
+
+                <!-- Sonuçlar -->
+                <div id="resultsContainer" class="results-container" style="margin-top:20px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3><i class="fas fa-video"></i> <span data-translate="footerAbout">VideoSummarizer Hakkında</span></h3>
+                <p data-translate="footerDescription">
+                    Gelişmiş yapay zeka teknolojileri ile videolarınızı anında özetleyen, modern ve kullanıcı dostu platformumuz.
+                </p>
+                <div class="social-links">
+                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-section">
+                <h3><i class="fas fa-link"></i> <span data-translate="footerQuickLinks">Hızlı Bağlantılar</span></h3>
+                <ul class="footer-links">
+                    <li><a href="https://www.enocta.com/" data-translate="footerHome"><i class="fas fa-home"></i> Ana Sayfa</a></li>
+                    <li><a href="#" data-translate="footerFeatures"><i class="fas fa-star"></i> Özellikler</a></li>
+                    <li><a href="#" data-translate="footerPricing"><i class="fas fa-tag"></i> Fiyatlandırma</a></li>
+                    <li><a href="#" data-translate="footerDocs"><i class="fas fa-book"></i> Dokümantasyon</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h3><i class="fas fa-headset"></i> <span data-translate="footerSupport">Destek</span></h3>
+                <ul class="footer-links">
+                    <li><a href="#" data-translate="footerHelp"><i class="fas fa-question-circle"></i> Yardım Merkezi</a></li>
+                    <li><a href="https://www.enocta.com/bize-ulasin" data-translate="footerContact"><i class="fas fa-envelope"></i> İletişim</a></li>
+                    <li><a href="#" data-translate="footerFaq"><i class="fas fa-comments"></i> SSS</a></li>
+                    <li><a href="#" data-translate="footerStatus"><i class="fas fa-heartbeat"></i> Sistem Durumu</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h3><i class="fas fa-shield-alt"></i> <span data-translate="footerLegal">Yasal</span></h3>
+                <ul class="footer-links">
+                    <li><a href="#" data-translate="footerPrivacy"><i class="fas fa-user-shield"></i> Gizlilik Politikası</a></li>
+                    <li><a href="#" data-translate="footerTerms"><i class="fas fa-file-contract"></i> Kullanım Koşulları</a></li>
+                    <li><a href="#" data-translate="footerCookies"><i class="fas fa-cookie-bite"></i> Çerez Politikası</a></li>
+                    <li><a href="#" data-translate="footerLicense"><i class="fas fa-certificate"></i> Lisans</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <div class="footer-container">
+                <p data-translate="footerCopyright">
+                    © 2025 VideoSummarizer. Tüm hakları saklıdır. <span class="heart">♥</span> ile yapıldı.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+
+<script src="static/script.js"> </script>
+
+</body>
+</html>
